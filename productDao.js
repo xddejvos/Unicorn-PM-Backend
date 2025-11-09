@@ -19,6 +19,22 @@ function create(product) {
     }
 };
 
+function update(product) {
+    try {
+    const prevData = get(product.id);
+    const currData = { ... prevData, ...product };
+
+    const filePath = path.join(productFolderPath, `${product.id}.json`);
+    const fileData = JSON.stringify(currData);
+    fs.writeFileSync(filePath, fileData, 'utf8');
+
+    return currData;
+
+    } catch (error) {
+        throw { code: 'failedToUpdateProduct', product: error.product }
+    }
+}
+
 function list() {
     try {
         //productFolderPath se zmeni na mongodb, ted ale nechame ve storage lokalne nebo idk
@@ -44,6 +60,7 @@ function search(query) {
 
 module.exports = {
     create,
+    update,
     list,
     search
 }

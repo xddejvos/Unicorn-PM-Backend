@@ -6,10 +6,7 @@ async function searchAbl(req, res) {
         const productList = productDao.search(search);
 
         if(!productList) {
-            res.status(500).json({ 
-                message: "Nelze načíst produkty.",
-                code: "failedToListProducts",
-            });
+            res.send("Takové položky neexistujou");
             return;
         }
   
