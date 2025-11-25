@@ -1,16 +1,9 @@
-const productDao = require('folderpathProProductDao');
+const dao = require('productDao');
 
-async function searchAbl(req, res) {
+async function searchAbl(dtoIn, res) {
     try {
-        const search = req.query ? req.query : req.body;
-        const productList = productDao.search(search);
-
-        if(!productList) {
-            res.send("Takové položky neexistujou");
-            return;
-        }
-  
-        res.json({ productList: productList });
+        const result = await dao.search(dtoIn);
+        res.json(result);
 
     } catch (error) {
         console.error(error);

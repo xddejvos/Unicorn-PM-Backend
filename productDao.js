@@ -1,61 +1,41 @@
-//line 1 - 38 je kdybychom nemeli backend, je to zaklad predtim nez se da implementovat search product
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto"); //šifrování a dešifrování dat
-
-const productFolderPath = path.join(__dirname, "storage", "productList");
-
-function create(product) {
+async function create(dtoIn) {
     try {
-        product.id = crypto.randomBytes(16).toString("hex");
-        const filePath = path.join(productFolderPath, `${product.id}.json`);
-        const fileData = JSON.stringify(product);
-
-        fs.writeFileSync(filePath, fileData, "utf8");
-        return product;
+        const result = await db.collection.insertOne({dtoIn})
+        return result;
 
     } catch (error) {
         throw { code: "failedToCreateProduct", product: error.product };
     }
 };
 
-function update(product) {
+async function update(dtoIn) {
     try {
-    const prevData = get(product.id);
-    const currData = { ... prevData, ...product };
-
-    const filePath = path.join(productFolderPath, `${product.id}.json`);
-    const fileData = JSON.stringify(currData);
-    fs.writeFileSync(filePath, fileData, 'utf8');
-
-    return currData;
+        const {_id, ...rest} = dtoIn
+        const result = await db.collection.updateOne({_id: _id}, {$set: rest});
+        return result;
 
     } catch (error) {
         throw { code: 'failedToUpdateProduct', product: error.product }
     }
 }
 
-function list() {
+async function list() {
     try {
-        //productFolderPath se zmeni na mongodb, ted ale nechame ve storage lokalne nebo idk
-        const files = fs.readdirSync(productFolderPath);
-        const productList = files.map((file) => {
-
-            const fileData = fs.readFileSync(path.join(productFolderPath, file), "utf8");
-            return JSON.parse(fileData);
-        });
-
-        return productList;
+        const result = await db.collection.find({});
+        return result;
 
     } catch (error) {
         throw { code: "failedToListProducts", product: error.product };
     }
 };
-//line 1 - 38 je kdybychom nemeli backend, je to zaklad predtim nez se da implementovat search product
 
-function search(query) {
-    const productList = list();
-    return productList.filter((item) => item.name === query);
+async function search(dtoIn) {
+    try {
+        const result = db.collection.find({"name": {$regex: "^" + dtoIn, $options: "i"}});
+        return result;
+    } catch (error) {
+        throw { code: 'unexpectedError', product: error.product };
+    };
 }
 
 module.exports = {
