@@ -1,40 +1,47 @@
+//pripojeni db
+
 async function create(dtoIn) {
     try {
-        const result = await db.collection.insertOne({dtoIn})
+        //db
+        const result = await db.insertOne(dtoIn);
         return result;
 
     } catch (error) {
-        throw { code: "failedToCreateProduct", product: error.product };
+        throw error
     }
 };
 
 async function update(dtoIn) {
     try {
+        //db
         const {_id, ...rest} = dtoIn
-        const result = await db.collection.updateOne({_id: _id}, {$set: rest});
+        const result = await db.updateOne({_id: new ObjectId(_id)}, {$set: rest});
         return result;
 
     } catch (error) {
-        throw { code: 'failedToUpdateProduct', product: error.product }
+        throw error
     }
 }
 
 async function list() {
     try {
-        const result = await db.collection.find({});
+        //db
+        const result = await db.find({});
         return result;
 
     } catch (error) {
-        throw { code: "failedToListProducts", product: error.product };
+        throw error
     }
 };
 
 async function search(dtoIn) {
     try {
-        const result = db.collection.find({"name": {$regex: "^" + dtoIn, $options: "i"}});
+        //db
+        const result = db.find({"name": {$regex: "^" + dtoIn, $options: "i"}});
         return result;
+
     } catch (error) {
-        throw { code: 'unexpectedError', product: error.product };
+        throw error
     };
 }
 

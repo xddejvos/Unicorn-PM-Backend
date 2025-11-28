@@ -1,13 +1,14 @@
 const dao = require('productDao');
 
-async function searchAbl(dtoIn, res) {
+async function searchAbl(req, res) {
     try {
+        const dtoIn = req.body.index;
         const result = await dao.search(dtoIn);
-        res.json(result);
+        return res.json(result);
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
 

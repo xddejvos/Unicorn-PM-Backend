@@ -1,18 +1,18 @@
 const dao = require('userDao');
 
-async function loginAbl(dtoIn, res) {
+async function loginAbl(req, res) {
     try {
+        const dtoIn = req.body;
         const result = await dao.get(dtoIn.email);
         if (dtoIn.password !== result.password) {
-            //nepovoleni vstupu do dashboardu
-            res.status(400).json({ code: "invalidInput", message: 'špatný email nebo heslo' });
+            res.status(400).json({ code: "notMatchingInput", message: 'špatný email nebo heslo' });
             return;
         }
-        res.json(result);
+        return res.json(result);
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
 

@@ -1,13 +1,10 @@
 const dao = require('userDao');
 
-//dependency
+//dependency ajv, ajv-formats
 const Ajv = require("ajv");
 const addFormats = require("ajv-formats").default;
 const ajv = new Ajv();
 addFormats(ajv);
-
-//dependency
-const crypto = require('crypto');
 
 const schema = {
     type: 'object',
@@ -17,12 +14,13 @@ const schema = {
         password: {type: 'string', minLength: 6, maxLength: 18}
     },
 
-    required: ['name', 'email' ,'password'],
+    required: ['name', 'email', 'password'],
     additionalProperties: false
 }
 
-async function searchAbl(dtoIn, res) {
+async function searchAbl(req, res) {
     try {
+        const dtoIn = req.body;
         const valid = ajv.validate(schema, dtoIn);
         if (!valid) {
             res.status(400).json({code: 'invalidInput', message: 'vstupní hodnoty nejsou validní'});
@@ -30,18 +28,17 @@ async function searchAbl(dtoIn, res) {
         }
 
         const user = {
-            _id: crypto.randomBytes(16).toString('hex'),
             name: dtoIn.name,
             email: dtoIn.email,
             password: dtoIn.password
         }
 
         const result = await dao.create(user);
-        res.json(result);
+        return res.json(result);
 
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 }
 
