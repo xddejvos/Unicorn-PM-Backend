@@ -14,7 +14,7 @@ async function create(dtoIn) {
 async function get(dtoIn) {
     try {
         //db
-        const result = await db.findOne({"email": new ObjectId(dtoIn)},{projection: {_id: 0}});
+        const result = await db.findOne({"email": dtoIn},{projection: {_id: 0}});
         return result;
 
     } catch (error) {
